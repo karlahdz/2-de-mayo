@@ -1,0 +1,33 @@
+pib<-read.csv("C:\\Users\\SALA-C21\\Documents\\PIB60.csv", header = TRUE)
+pibts<-ts(pib[,2], start=1960, end=2015)
+plot(pibts)
+require(fpp)
+plot(pibts,main="PIB en México 1960-2015", ylab="tasa de crecimiento", xlab="años")
+res<-residuals(snaive(pibts))
+res2<-residuals(rwf(pibts, drift = T))
+plot(res,main="rESIDUAL INGENUO ESTACIONAL", ylab="residuales", xlab="años") ##para saber si la varianza es constante
+plot(res2,main="rESIDUAL METODO DE LA DERIVA", ylab="residuales", xlab="años")
+res
+res2
+hist(res, main="Histograma residuales") ##para saber si los residuos se distribuyen normalmente, en este caso si se distribuye normal
+Acf(res, main="ACF residuales")##para saber si hay o no correlacion entre los residuos, en este caso no hay correlación ya que solo una de las lineas se sale y oara que hubiera tendrian que salir al menos 5
+##si cumple con los supuestos excepto con la varianza
+hist(res2, main="Histograma residuales")
+Acf(res2, main="ACF residuales")
+res3<-residuals(meanf(pibts))
+res4<-residuals(naive(pibts))
+plot(res3,main="rESIDUAL METODO DE LA MEDIA", ylab="residuales", xlab="años")##la varianza no es constante
+hist(res3, main="Histograma residuales")##no se distribuye normal
+Acf(res3, main="ACF residuales")##no hay correlación
+plot(res4,main="rESIDUAL METODO ingenuo", ylab="residuales", xlab="años")##la varianza no es totalmente constante pero se acerca bastante, solo hay unos picos que salen
+hist(res4, main="Histograma residuales")##si se distribuye normal
+Acf(res4, main="ACF residuales")##no hay correlación
+Box.test(res,lag=10, fitdf = 0) ##box-pierce lag=momentos que estamos pronosticando, si no es estacional la serie se recomienda usar el 10, si hay estacionalidad ocupamos 2 por el periodo de estacionalidad
+Box.test(res,lag=10,fitdf = 0, type = "Lj")##Box Ljung, fitdf=grados de libertad que son extraidos de nuestra serie de residuales
+Box.test(res2,lag=10, fitdf = 0)
+Box.test(res2,lag=10,fitdf = 0, type = "Lj")
+Box.test(res3,lag=10, fitdf = 0)
+Box.test(res3,lag=10,fitdf = 0, type = "Lj")
+Box.test(res4,lag=10, fitdf = 0)
+Box.test(res4,lag=10,fitdf = 0, type = "Lj")
+##con Box.test buscamos el pi value, si nuestro pi value mayor a .05 no rechazamos nuestra hipotesis nula lo que quiere decir que hay aleatoriedad y dependencia en nuestros residuos
